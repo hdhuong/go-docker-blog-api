@@ -23,7 +23,7 @@ func (p PostRepository) FindAll(post models.Post, keyword string) (*[]models.Pos
 	var posts []models.Post
 	var totalRows int64 = 0
 
-	queryBuilder := p.db.DB.Order("created_at desc").Model(&models.Post{})
+	queryBuilder := p.db.DB.Model(&models.Post{})
 
 	// Search parameter
 	if keyword != "" {
@@ -32,10 +32,14 @@ func (p PostRepository) FindAll(post models.Post, keyword string) (*[]models.Pos
 			p.db.DB.Where("post.title LIKE ? ", queryKeyword))
 	}
 
-	err := queryBuilder.
-		Where(post).
-		Find(&posts).
-		Count(&totalRows).Error
+	// Count total rows first before applying order and pagination
+	err := queryBuilder.Where(post).Count(&totalRows).Error
+	if err != nil {
+		return &posts, 0, err
+	}
+
+	// Then find the actual records with ordering
+	err = queryBuilder.Order("created_at desc").Find(&posts).Error
 	return &posts, totalRows, err
 }
 
@@ -46,7 +50,6 @@ func (p PostRepository) Update(post models.Post) error {
 func (p PostRepository) Find(post models.Post) (models.Post, error) {
 	var posts models.Post
 	err := p.db.DB.
-		Debug().
 		Model(&models.Post{}).
 		Where(&post).
 		Take(&posts).Error

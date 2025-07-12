@@ -53,7 +53,10 @@ func (p PostController) GetPosts(ctx *gin.Context) {
 // AddPost : AddPost controller
 func (p *PostController) AddPost(ctx *gin.Context) {
 	var post models.Post
-	ctx.ShouldBindJSON(&post)
+	if err := ctx.ShouldBindJSON(&post); err != nil {
+		utils.ErrorJSON(ctx, http.StatusBadRequest, "Invalid JSON format")
+		return
+	}
 
 	if post.Title == "" {
 		utils.ErrorJSON(ctx, http.StatusBadRequest, "Title is required")
@@ -134,7 +137,10 @@ func (p PostController) UpdatePost(ctx *gin.Context) {
 		utils.ErrorJSON(ctx, http.StatusBadRequest, "Post with given id not found")
 		return
 	}
-	ctx.ShouldBindJSON(&postRecord)
+	if err := ctx.ShouldBindJSON(&postRecord); err != nil {
+		utils.ErrorJSON(ctx, http.StatusBadRequest, "Invalid JSON format")
+		return
+	}
 
 	if postRecord.Title == "" {
 		utils.ErrorJSON(ctx, http.StatusBadRequest, "Title is required")
