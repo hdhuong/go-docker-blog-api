@@ -21,7 +21,6 @@ func ConnectDatabase() Database {
 	DB_NAME := os.Getenv("DB_NAME")
 
 	connectionDSN := fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", HOST, PORT, USER, DB_NAME, PASS)
-	fmt.Println("connection name is\t\t", connectionDSN)
 	db, err := gorm.Open(postgres.Open(connectionDSN), &gorm.Config{})
 
 	if err != nil {

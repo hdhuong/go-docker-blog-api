@@ -8,6 +8,7 @@ import (
 	"blog/config"
 	"blog/database"
 	"blog/models"
+	"os"
 )
 
 func init() {
@@ -25,5 +26,10 @@ func main() {
 	postRoute.Setup()
 
 	db.DB.AutoMigrate(&models.Post{})
-	router.Gin.Run(":8001")
+	
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8000" // Default to port 8000 to match .env.example
+	}
+	router.Gin.Run(":" + port)
 }
